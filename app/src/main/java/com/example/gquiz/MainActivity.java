@@ -2,16 +2,24 @@ package com.example.gquiz;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+
 public class MainActivity extends LoggingActivity {
+
+    private static final int REQUEST_CODE_CHEAT = 42;
+
 
     private Button trueButton;
     private Button falseButton;
+    private Button cheatButton;
     private Button prevButton;
     private Button nextButton;
     private TextView questionView;
@@ -34,6 +42,7 @@ public class MainActivity extends LoggingActivity {
 
         trueButton = findViewById(R.id.true_button);
         falseButton = findViewById(R.id.false_button);
+        cheatButton = findViewById(R.id.cheat_button);
         prevButton = findViewById(R.id.prev_button);
         nextButton = findViewById(R.id.next_button);
         questionView = findViewById(R.id.question);
@@ -51,6 +60,16 @@ public class MainActivity extends LoggingActivity {
             @Override
             public void onClick(View v) {
                 onAnswerSelected(false);
+            }
+        });
+
+        cheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(
+                        CheatActivity.makeIntent(MainActivity.this, getCurrentQuestion().getCorrectAnswer()),
+                        REQUEST_CODE_CHEAT
+                );
             }
         });
 
@@ -81,6 +100,17 @@ public class MainActivity extends LoggingActivity {
                 applyCurrentQuestion();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (resultCode == Activity.RESULT_OK) {
+                showToast(R.string.judgment_toast);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void applyCurrentQuestion() {
